@@ -11,7 +11,7 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    const { apiKey, prompt, model = "gemini-pro" } = JSON.parse(event.body);
+    const { apiKey, prompt, model = "gemini-2.0-flash" } = JSON.parse(event.body);
     
     if (!apiKey) {
       return {
