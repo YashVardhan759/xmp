@@ -397,3 +397,184 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+/* Add to your App.css file - Markdown styling */
+
+/* Enhanced Chat UI */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--light-gray);
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.chat-header h2 {
+  margin: 0;
+  color: var(--primary-color);
+}
+
+.clear-chat-btn {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.empty-chat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-style: italic;
+}
+
+/* Message styling */
+.message {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  max-width: 85%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.message.user {
+  background-color: #e3f2fd;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+
+.message.assistant {
+  background-color: var(--white);
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.message.system {
+  background-color: #fff3cd;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  max-width: 70%;
+}
+
+.message-header {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.message-content {
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+/* Markdown styling */
+.message-content h1 {
+  font-size: 1.8rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.message-content h2 {
+  font-size: 1.5rem;
+  margin-top: 1.4rem;
+  margin-bottom: 0.8rem;
+  color: var(--primary-color);
+}
+
+.message-content h3 {
+  font-size: 1.3rem;
+  margin-top: 1.2rem;
+  margin-bottom: 0.7rem;
+}
+
+.message-content h4 {
+  font-size: 1.1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.message-content p {
+  margin-bottom: 1rem;
+}
+
+.message-content ul, 
+.message-content ol {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  padding-left: 2rem;
+}
+
+.message-content li {
+  margin-bottom: 0.5rem;
+}
+
+.message-content blockquote {
+  border-left: 4px solid var(--primary-color);
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.message-content pre {
+  margin: 1rem 0;
+  padding: 0;
+  overflow: auto;
+  border-radius: 6px;
+}
+
+.message-content code {
+  font-family: monospace;
+  background-color: #f1f3f4;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.message-content pre > div {
+  border-radius: 6px;
+}
+
+.message-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.message-content th,
+.message-content td {
+  border: 1px solid #e1e5eb;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.message-content th {
+  background-color: #f1f3f4;
+}
+
+.message-content a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.message-content a:hover {
+  text-decoration: underline;
+}
+
+.message-content hr {
+  border: 0;
+  border-top: 1px solid #e1e5eb;
+  margin: 1.5rem 0;
+}
+
+.message-content img {
+  max-width: 100%;
+  border-radius: 4px;
+}

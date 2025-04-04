@@ -1,7 +1,10 @@
-// src/components/Chat.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
@@ -16,6 +19,7 @@ function Chat() {
   const [topP, setTopP] = useState(0.95);
   const [maxOutputTokens, setMaxOutputTokens] = useState(2048);
   const [debugInfo, setDebugInfo] = useState(null);
+  const [chatSession, setChatSession] = useState([]);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -28,6 +32,7 @@ function Chat() {
     const savedMaxOutputTokens = localStorage.getItem('geminiMaxOutputTokens');
     const savedCustomModel = localStorage.getItem('geminiCustomModel');
     const savedUseCustomModel = localStorage.getItem('geminiUseCustomModel');
+    const savedChatSession = localStorage.getItem('geminiChatSession');
     
     if (savedApiKey) setApiKey(savedApiKey);
     if (savedModel) setModel(savedModel);
@@ -37,12 +42,40 @@ function Chat() {
     if (savedMaxOutputTokens) setMaxOutputTokens(parseInt(savedMaxOutputTokens));
     if (savedCustomModel) setCustomModel(savedCustomModel);
     if (savedUseCustomModel) setUseCustomModel(savedUseCustomModel === 'true');
+    if (savedChatSession) {
+      try {
+        const parsedSession = JSON.parse(savedChatSession);
+        setChatSession(parsedSession);
+        
+        // Also restore visible messages from the chat session
+        const visibleMessages = parsedSession.map(msg => ({
+          role: msg.role,
+          content: msg.parts[0].text
+        }));
+        setMessages(visibleMessages);
+      } catch (e) {
+        console.error('Error parsing saved chat session:', e);
+      }
+    }
   }, []);
 
   useEffect(() => {
     // Scroll to bottom of chat when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Save chat session to localStorage whenever it changes
+  useEffect(() => {
+    if (chatSession.length > 0) {
+      localStorage.setItem('geminiChatSession', JSON.stringify(chatSession));
+    }
+  }, [chatSession]);
+
+  const clearChat = () => {
+    setMessages([]);
+    setChatSession([]);
+    localStorage.removeItem('geminiChatSession');
+  };
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -57,6 +90,15 @@ function Chat() {
 
     const userMessage = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
+    
+    // Add user message to chat session in Gemini format
+    const userChatMessage = {
+      role: 'user',
+      parts: [{ text: input }]
+    };
+    const updatedChatSession = [...chatSession, userChatMessage];
+    setChatSession(updatedChatSession);
+    
     setInput('');
     setLoading(true);
     setDebugInfo(null);
@@ -67,14 +109,16 @@ function Chat() {
       
       const response = await axios.post('/.netlify/functions/gemini-api', {
         apiKey,
+        history: updatedChatSession,
         prompt: input,
-        model,
+        model: modelToUse,
         useCustomModel,
         customModel,
         temperature,
         topK,
         topP,
-        maxOutputTokens
+        maxOutputTokens,
+        isChatMode: true
       });
       
       console.log('API Response:', response.data);
@@ -87,6 +131,13 @@ function Chat() {
       if (response.data.candidates && response.data.candidates[0]?.content?.parts) {
         const aiContent = response.data.candidates[0].content.parts[0].text;
         setMessages(prev => [...prev, { role: 'assistant', content: aiContent }]);
+        
+        // Add AI response to chat session in Gemini format
+        const aiChatMessage = {
+          role: 'model',
+          parts: [{ text: aiContent }]
+        };
+        setChatSession(prevSession => [...prevSession, aiChatMessage]);
       } else {
         // Handle unexpected response format
         setMessages(prev => [
@@ -125,6 +176,27 @@ function Chat() {
       setLoading(false);
     }
   };
+  
+  // Custom renderer components for ReactMarkdown
+  const renderers = {
+    code({node, inline, className, children, ...props}) {
+      const match = /language-(\w+)/.exec(className || '');
+      return !inline && match ? (
+        <SyntaxHighlighter
+          style={atomDark}
+          language={match[1]}
+          PreTag="div"
+          {...props}
+        >
+          {String(children).replace(/\n$/, '')}
+        </SyntaxHighlighter>
+      ) : (
+        <code className={className} {...props}>
+          {children}
+        </code>
+      );
+    }
+  };
 
   return (
     <div className="chat-page">
@@ -135,10 +207,40 @@ function Chat() {
       )}
       
       <div className="chat-container">
+        <div className="chat-header">
+          <h2>Chat with Gemini</h2>
+          <button 
+            onClick={clearChat} 
+            className="btn secondary clear-chat-btn"
+            title="Clear conversation"
+          >
+            Clear Chat
+          </button>
+        </div>
+        
         <div className="messages">
+          {messages.length === 0 && (
+            <div className="empty-chat">
+              <p>Start a new conversation with Gemini.</p>
+            </div>
+          )}
+          
           {messages.map((msg, index) => (
             <div key={index} className={`message ${msg.role}`}>
-              <div className="message-content">{msg.content}</div>
+              <div className="message-header">
+                {msg.role === 'user' ? 'You' : msg.role === 'assistant' ? 'Gemini' : 'System'}
+              </div>
+              <div className="message-content">
+                {msg.role === 'assistant' ? (
+                  <ReactMarkdown 
+                    children={msg.content} 
+                    remarkPlugins={[remarkGfm]}
+                    components={renderers}
+                  />
+                ) : (
+                  msg.content
+                )}
+              </div>
             </div>
           ))}
           {loading && <div className="message system">Gemini is thinking...</div>}
@@ -150,7 +252,7 @@ function Chat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            onKeyPress={(e) => {
+            onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
