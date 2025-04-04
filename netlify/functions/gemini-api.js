@@ -11,7 +11,17 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    const { apiKey, prompt, model = "gemini-2.0-flash" } = JSON.parse(event.body);
+    const { 
+      apiKey, 
+      prompt, 
+      model = "gemini-1.5-flash",
+      useCustomModel = false,
+      customModel = "",
+      temperature = 0.7,
+      topK = 40,
+      topP = 0.95,
+      maxOutputTokens = 2048
+    } = JSON.parse(event.body);
     
     if (!apiKey) {
       return {
@@ -20,27 +30,43 @@ exports.handler = async function(event, context) {
       };
     }
 
-    console.log(`Calling Gemini API with model: ${model}`);
+    // Determine which model to use
+    const modelToUse = useCustomModel && customModel ? customModel : model;
+    console.log(`Calling Gemini API with model: ${modelToUse}`);
 
-    // Updated API URL - this is the current endpoint format for Gemini
-    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+    // API URL with selected model
+    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/${modelToUse}:generateContent?key=${apiKey}`;
     
-    console.log(`API URL: ${apiUrl.replace(apiKey, '***')}`);
+    // Prepare request payload with generation parameters
+    const payload = {
+      contents: [
+        {
+          parts: [
+            {
+              text: prompt
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: parseFloat(temperature),
+        topK: parseInt(topK),
+        topP: parseFloat(topP),
+        maxOutputTokens: parseInt(maxOutputTokens)
+      }
+    };
+
+    console.log(`API Request payload:`, JSON.stringify({
+      ...payload,
+      generationConfig: {
+        ...payload.generationConfig
+      }
+    }));
 
     // Call Gemini API
     const response = await axios.post(
       apiUrl,
-      {
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt
-              }
-            ]
-          }
-        ]
-      },
+      payload,
       {
         headers: {
           'Content-Type': 'application/json'

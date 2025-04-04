@@ -8,17 +8,35 @@ function Chat() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [apiKey, setApiKey] = useState('');
-  const [model, setModel] = useState('gemini-pro');
+  const [model, setModel] = useState('');
+  const [useCustomModel, setUseCustomModel] = useState(false);
+  const [customModel, setCustomModel] = useState('');
+  const [temperature, setTemperature] = useState(0.7);
+  const [topK, setTopK] = useState(40);
+  const [topP, setTopP] = useState(0.95);
+  const [maxOutputTokens, setMaxOutputTokens] = useState(2048);
   const [debugInfo, setDebugInfo] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    // Load API key and model from localStorage
+    // Load settings from localStorage
     const savedApiKey = localStorage.getItem('geminiApiKey');
     const savedModel = localStorage.getItem('geminiModel');
+    const savedTemperature = localStorage.getItem('geminiTemperature');
+    const savedTopK = localStorage.getItem('geminiTopK');
+    const savedTopP = localStorage.getItem('geminiTopP');
+    const savedMaxOutputTokens = localStorage.getItem('geminiMaxOutputTokens');
+    const savedCustomModel = localStorage.getItem('geminiCustomModel');
+    const savedUseCustomModel = localStorage.getItem('geminiUseCustomModel');
     
     if (savedApiKey) setApiKey(savedApiKey);
     if (savedModel) setModel(savedModel);
+    if (savedTemperature) setTemperature(parseFloat(savedTemperature));
+    if (savedTopK) setTopK(parseInt(savedTopK));
+    if (savedTopP) setTopP(parseFloat(savedTopP));
+    if (savedMaxOutputTokens) setMaxOutputTokens(parseInt(savedMaxOutputTokens));
+    if (savedCustomModel) setCustomModel(savedCustomModel);
+    if (savedUseCustomModel) setUseCustomModel(savedUseCustomModel === 'true');
   }, []);
 
   useEffect(() => {
@@ -44,12 +62,19 @@ function Chat() {
     setDebugInfo(null);
 
     try {
-      console.log('Sending request to Gemini API with model:', model);
+      const modelToUse = useCustomModel && customModel ? customModel : model;
+      console.log(`Sending request to Gemini API with model: ${modelToUse}`);
       
       const response = await axios.post('/.netlify/functions/gemini-api', {
         apiKey,
         prompt: input,
-        model
+        model,
+        useCustomModel,
+        customModel,
+        temperature,
+        topK,
+        topP,
+        maxOutputTokens
       });
       
       console.log('API Response:', response.data);
@@ -74,7 +99,6 @@ function Chat() {
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      console.error('Error details:', error.response?.data || error.message);
       
       // Store detailed error info for debugging
       setDebugInfo({
@@ -85,13 +109,16 @@ function Chat() {
         data: error.response?.data
       });
 
-      // Show error in chat
+      // Show error in chat with more details
+      const errorMessage = error.response?.data?.apiErrorDetails?.error || 
+                          error.response?.data?.error || 
+                          error.message;
+      
       setMessages(prev => [
         ...prev, 
         { 
           role: 'system', 
-          content: `Error: ${error.response?.status || ''} ${error.response?.statusText || ''} - ${error.message}` +
-                   `\n\nDetails: ${JSON.stringify(error.response?.data || {})}`
+          content: `Error: ${errorMessage}`
         }
       ]);
     } finally {
