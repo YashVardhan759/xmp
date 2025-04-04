@@ -20,9 +20,16 @@ exports.handler = async function(event, context) {
       };
     }
 
+    console.log(`Calling Gemini API with model: ${model}`);
+
+    // Updated API URL - this is the current endpoint format for Gemini
+    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+    
+    console.log(`API URL: ${apiUrl.replace(apiKey, '***')}`);
+
     // Call Gemini API
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      apiUrl,
       {
         contents: [
           {
@@ -41,19 +48,30 @@ exports.handler = async function(event, context) {
       }
     );
 
+    console.log('Gemini API response received');
+    
     return {
       statusCode: 200,
       body: JSON.stringify(response.data)
     };
   } catch (error) {
-    console.error('Error calling Gemini API:', error);
+    console.error('Error calling Gemini API:', error.message);
+    
+    let errorResponse = {
+      error: 'Failed to call Gemini API',
+      message: error.message,
+      status: error.response?.status || 'unknown',
+      statusText: error.response?.statusText || 'unknown'
+    };
+    
+    // Include the error response data if available
+    if (error.response?.data) {
+      errorResponse.apiErrorDetails = error.response.data;
+    }
     
     return {
-      statusCode: 500,
-      body: JSON.stringify({ 
-        error: 'Failed to call Gemini API',
-        details: error.message
-      })
+      statusCode: error.response?.status || 500,
+      body: JSON.stringify(errorResponse)
     };
   }
 }
