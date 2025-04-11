@@ -1,11 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import remarkGfm from 'remark-gfm';
-
 function Chat() {
   const { chatId } = useParams();
   const navigate = useNavigate();
@@ -22,7 +14,8 @@ function Chat() {
   const [maxOutputTokens, setMaxOutputTokens] = useState(2048);
   const [debugInfo, setDebugInfo] = useState(null);
   const [chatSession, setChatSession] = useState([]);
-  const [chatTitle, setChatTitle] = useState("New Exploration");
+  const [chatTitle, setChatTitle] = useState("New Learning Module");
+  const [inputVisible, setInputVisible] = useState(true);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -62,6 +55,7 @@ function Chat() {
         setChatSession(selectedChat.session);
         
         // Convert the chat session to visible messages with proper formatting
+        // Important: Preserving the markdown formatting by not modifying content
         const visibleMessages = selectedChat.session.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'assistant',
           content: msg.parts[0].text
@@ -70,7 +64,7 @@ function Chat() {
         setMessages(visibleMessages);
       } else {
         // Handle case where chat doesn't exist
-        setChatTitle("New Exploration");
+        setChatTitle("New Learning Module");
         setMessages([]);
         setChatSession([]);
       }
@@ -97,12 +91,12 @@ function Chat() {
       
       // Generate a title from first user message if not set
       let title = chatTitle;
-      if (title === "New Exploration" && chatSession.length > 0) {
+      if (title === "New Learning Module" && chatSession.length > 0) {
         const firstMessage = chatSession[0].parts[0].text;
         title = firstMessage.substring(0, 30) + (firstMessage.length > 30 ? '...' : '');
       }
       
-      // Save current chat
+      // Save current chat exactly as is to preserve formatting
       savedChats[currentId] = {
         id: currentId,
         title: title,
@@ -133,13 +127,17 @@ function Chat() {
 
   const createNewChat = () => {
     navigate('/chat');
-    setChatTitle("New Exploration");
+    setChatTitle("New Learning Module");
     setMessages([]);
     setChatSession([]);
   };
 
   const handleTitleChange = (e) => {
     setChatTitle(e.target.value);
+  };
+
+  const toggleInputVisibility = () => {
+    setInputVisible(!inputVisible);
   };
 
   const sendMessage = async () => {
@@ -241,57 +239,36 @@ function Chat() {
       setLoading(false);
     }
   };
-  
-  // Custom renderer components for ReactMarkdown
-  const renderers = {
-    code({node, inline, className, children, ...props}) {
-      const match = /language-(\w+)/.exec(className || '');
-      return !inline && match ? (
-        <SyntaxHighlighter
-          style={atomDark}
-          language={match[1]}
-          PreTag="div"
-          {...props}
-        >
-          {String(children).replace(/\n$/, '')}
-        </SyntaxHighlighter>
-      ) : (
-        <code className={className} {...props}>
-          {children}
-        </code>
-      );
-    }
-  };
 
   return (
     <div className="learning-session">
       {!apiKey && (
         <div className="warning">
-          <p>API key not set. Please <Link to="/settings">configure your API key</Link> to start your learning session.</p>
+          <p>API key not set. Please configure your API key to start your learning session.</p>
         </div>
       )}
       
       <div className="learning-workspace">
         <div className="workspace-sidebar">
           <button className="new-session-btn" onClick={createNewChat}>
-            New Exploration
+            Start New Topic
           </button>
           
           <div className="session-info">
-            <input 
-              type="text" 
+            <input
+              type="text"
+              className="session-title-input"
               value={chatTitle}
               onChange={handleTitleChange}
-              className="session-title-input"
-              placeholder="Session Title"
+              placeholder="Topic Title"
             />
             
             <div className="session-meta">
-              {messages.length > 0 ? `${messages.length} exchanges` : 'No exchanges yet'}
+              {messages.length > 0 ? `${messages.length} concept exchanges` : 'No exchanges yet'}
             </div>
           </div>
         </div>
-        
+
         <div className="learning-content">
           <div className="messages-container">
             {messages.length === 0 && (
@@ -302,56 +279,86 @@ function Chat() {
             )}
             
             {messages.map((msg, index) => (
-              <div key={index} className={`message ${msg.role}`}>
-                <div className="message-header">
-                  {msg.role === 'user' ? 'You' : msg.role === 'assistant' ? 'Tutor' : 'System'}
+              <div key={index} className="qa-item">
+                <div className={`qa-label ${msg.role === 'user' ? 'question-label' : 'answer-label'}`}>
+                  {msg.role === 'user' ? 'Que:' : msg.role === 'assistant' ? 'Ans:' : 'Note:'}
                 </div>
-                <div className="message-content">
+                <div className="qa-content">
                   {msg.role === 'user' ? (
-                    <p>{msg.content}</p>
+                    <div>{msg.content}</div>
                   ) : (
                     <ReactMarkdown 
-                      children={msg.content} 
                       remarkPlugins={[remarkGfm]}
-                      components={renderers}
-                    />
+                      components={{
+                        code({node, inline, className, children, ...props}) {
+                          const match = /language-(\w+)/.exec(className || '');
+                          return !inline && match ? (
+                            <SyntaxHighlighter
+                              language={match[1]}
+                              style={docco}
+                              PreTag="div"
+                              {...props}
+                            >
+                              {String(children).replace(/\n$/, '')}
+                            </SyntaxHighlighter>
+                          ) : (
+                            <code className={className} {...props}>
+                              {children}
+                            </code>
+                          );
+                        }
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
                   )}
                 </div>
               </div>
             ))}
-            {loading && <div className="message system">Processing your request...</div>}
+            {loading && <div className="loading-indicator">Processing your query...</div>}
             <div ref={messagesEndRef} />
           </div>
           
-          <div className="input-area">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a question or explore a concept..."
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage();
-                }
-              }}
-            />
+          <div className="input-controls">
             <button 
-              onClick={sendMessage}
-              disabled={loading || !input.trim()}
-              className="send-btn"
+              className="toggle-input-btn" 
+              onClick={toggleInputVisibility}
             >
-              Submit
+              {inputVisible ? 'Hide Input' : 'Show Input'}
             </button>
+            
+            {inputVisible && (
+              <div className="input-area">
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="What would you like to learn about today?"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                />
+                <button onClick={sendMessage} disabled={loading || !input.trim()}>
+                  Submit
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {debugInfo && (
-        <div className={`debug-panel ${debugInfo.type}`}>
-          <h3>API Debug Information</h3>
-          <div className="debug-content">
-            <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
-          </div>
+        <div className="debug-panel">
+          <details>
+            <summary>API Debug Information</summary>
+            <div className="debug-content">
+              <pre>
+                {JSON.stringify(debugInfo, null, 2)}
+              </pre>
+            </div>
+          </details>
         </div>
       )}
     </div>
