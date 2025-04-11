@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
 import Chat from './components/Chat';
 import Settings from './components/Settings';
+import ChatList from './components/ChatList';
 import Navbar from './components/Navbar';
 import './App.css';
 
@@ -16,6 +17,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/chat/:chatId" element={<Chat />} />
+            <Route path="/history" element={<ChatList />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </main>
