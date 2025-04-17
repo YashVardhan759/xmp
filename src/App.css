@@ -6,7 +6,6 @@
   --light-gray: #e0e6ed;
   --white: #ffffff;
   --accent-color: #81c784
-  
 }
 
 * {
@@ -20,7 +19,7 @@ body {
   background-color: var(--background-color);
   color: var(--text-color);
   line-height: 1.6;
-  font-family: "Segoe UI Symbol";
+  font-family: Segoe UI Symbol
 }
 
 .app {
@@ -35,7 +34,7 @@ body {
   align-items: center;
   padding: .7rem 1.5rem;
   background-color: var(--primary-color);
-  box-shadow: 0 2px 4px #0000001a
+  box-shadow: 0 2px 4px #0000001a;
 }
 
 .logo {
@@ -62,6 +61,7 @@ body {
 }
 
 .content {
+  display: flex;
   flex: 1;
   padding: 0;
   margin: 0 auto;
@@ -246,7 +246,8 @@ body {
 .learning-session {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 50px)
+  flex: 1;
+  /* height: calc(100vh - ); */
 }
 
 .learning-workspace {
@@ -416,7 +417,9 @@ body {
 }
 
 .input-controls {
-  border-top: 1px solid var(--light-gray)
+  border-top: 1px solid var(--light-gray);
+  display: flex;
+  flex-direction: column;
 }
 
 .toggle-input-btn {
@@ -427,6 +430,7 @@ body {
   cursor: pointer;
   width: 100%;
   text-align: center;
+  margin: 0;
   transition: background-color .3s
 }
 
@@ -500,101 +504,88 @@ body {
   font-size: .9rem
 }
 
-
-
-.learning-history{
+.learning-history {
+  display: flex;
   margin: 15px 30px;
   padding: 10px;
   border-radius: 10px;
+  flex: 1;
 }
 
-.history-header{
+.history-header {
   height: fit-content;
   display: flex;
   flex-direction: column;
   padding: 10px;
   border-radius: 8px;
-  box-shadow: 1px 1px 1px 1px 2px black;
-  margin-bottom: 20px;
+  box-shadow: 1px 1px 1px 1px 2px #000;
+  margin-bottom: 20px
 }
 
-.history-header *{
+.history-header * {
   margin: 6px;
-  width: fit-content;
+  width: fit-content
 }
 
-.history-header a{
-  padding: 3px 10px 4px 10px ; 
+.history-header a {
+  padding: 3px 10px 4px
 }
 
-.session-list{
+.session-list {
   margin: 10px;
-  /* padding: 2px; */
-  /* border: 1px solid black; */
   display: flex;
-  flex-direction: column;
-  /* background-color: lightgreen; */
+  flex-direction: column
 }
 
-.session-card{
+.session-card {
   padding: 10px 16px;
-  margin-bottom: 5px;
-  /* border: 1px solid black; */
-  /* background-color: lightgrey; */
+  margin-bottom: 5px
 }
 
 .session-card:hover {
-  /* padding: 2px;
-  margin: 4px; */
-  /* border: 1px solid black; */
-  /* background-color: lightgrey; */
-  box-shadow: 1px 1px 3px gray ;
+  box-shadow: 1px 1px 3px gray;
   border-radius: 5px;
-  background-color: white;
+  background-color: #fff
 }
 
-.session-card:hover > * button{
-  visibility: visible;
+.session-card:hover>* button {
+  visibility: visible
 }
 
-.session-card button:hover{
-  transform: scale(1.4);
+.session-card button:hover {
+  transform: scale(1.4)
 }
 
-.session-details{
+.session-details {
   padding: 2px;
   display: flex;
   flex-direction: row;
   font-size: small;
   text-align: end;
-  justify-content: space-between;
-  /* border: 1px solid black; */
+  justify-content: space-between
 }
 
-.session-title{
+.session-title {
   font-size: large;
   font-weight: 300;
-  color: black;
-  font-family: "Segoe UI Symbol";
+  color: #000;
+  font-family: Segoe UI Symbol;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  
+  justify-content: space-between
 }
 
-.session-title button{
+.session-title button {
   visibility: hidden;
   margin-right: 5px;
   height: fit-content;
   font-size: larger;
-  color: lightcoral;
-  background-color: white;
+  color: #f08080;
+  background-color: #fff;
   border: none;
-  transform: scale(1.2);
+  transform: scale(1.2)
 }
 
-
-
 a {
-  text-decoration: none;
+  text-decoration: none
 }
