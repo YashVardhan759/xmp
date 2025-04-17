@@ -101,7 +101,7 @@ function Chat() {
       let title = chatTitle;
       if (title === "New Learning Module" && chatSession.length > 0) {
         const firstMessage = chatSession[0].parts[0].text;
-        title = firstMessage.substring(0, 30) + (firstMessage.length > 30 ? '...' : '');
+        title = firstMessage.substring(0, 80) + (firstMessage.length > 80 ? '...' : '');
       }
       
       // Save current chat exactly as is to preserve formatting
@@ -277,6 +277,7 @@ function Chat() {
           </div>
         </div>
         <div className="learning-content">
+
           <div className="messages-container">
             {messages.length === 0 && (
               <div className="empty-session">
@@ -341,35 +342,36 @@ function Chat() {
 
                 {loading && <div className="loading-indicator">Processing your query...</div>}
                 <div ref={messagesEndRef} />
-              </div>
-              
-              <div className="input-controls">
-                <button 
-                  className="toggle-input-btn" 
-                  onClick={toggleInputVisibility}
-                >
-                  {inputVisible ? '' : ''}
+          </div>
+          
+          <div className="input-controls">
+            <button 
+              className="toggle-input-btn" 
+              onClick={toggleInputVisibility}
+            >
+              {inputVisible ? '' : ''}
+            </button>
+            
+            {inputVisible && (
+              <div className="input-area">
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="What would you like to learn about today?"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                />
+                <button onClick={sendMessage} disabled={loading || !input.trim()}>
+                  Submit
                 </button>
-                
-                {inputVisible && (
-                  <div className="input-area">
-                    <textarea
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder="What would you like to learn about today?"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          sendMessage();
-                        }
-                      }}
-                    />
-                    <button onClick={sendMessage} disabled={loading || !input.trim()}>
-                      Submit
-                    </button>
-                  </div>
-                )}
               </div>
+            )}
+          </div>
+        
         </div>
     </div> 
       

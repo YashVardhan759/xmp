@@ -67,20 +67,19 @@ function ChatList() {
         <div className="session-list">
           {savedChats.map((chat) => (
             <Link to={`/chat/${chat.id}`} key={chat.id} className="session-card">
-              <div className="session-title">{chat.title}</div>
+              <div className="session-title">
+                <span>{chat.title}</span>
+                <button onClick={(e) => deleteSession(chat.id, e)} className="delete-session-btn" title="Delete this session">
+                 &#x1F5D1;
+                </button>
+              </div>
               <div className="session-details">
                 <span className="session-date">Last updated: {formatDate(chat.updatedAt)}</span>
                 <span className="session-exchanges">
                   {chat.session.length} exchanges
                 </span>
               </div>
-              <button 
-                onClick={(e) => deleteSession(chat.id, e)} 
-                className="delete-session-btn"
-                title="Delete this session"
-              >
-                Delete
-              </button>
+              
             </Link>
           ))}
         </div>
