@@ -304,7 +304,7 @@ function Chat() {
 
 
 
-            
+
             {/* {messages.map((msg, index) => (
               <div key={index} className="qa-item">
                 <div className={`qa-label ${msg.role === 'user' ? 'question-label' : 'answer-label'}`}>
@@ -415,7 +415,7 @@ function Chat() {
               className="toggle-input-btn" 
               onClick={toggleInputVisibility}
             >
-              {inputVisible ? 'Hide Input' : 'Show Input'}
+              {inputVisible ? '' : ''}
             </button>
             
             {inputVisible && (
