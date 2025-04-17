@@ -286,7 +286,26 @@ function Chat() {
               </div>
             )}
             
-            {messages.map((msg, index) => (
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+            {/* {messages.map((msg, index) => (
               <div key={index} className="qa-item">
                 <div className={`qa-label ${msg.role === 'user' ? 'question-label' : 'answer-label'}`}>
                   {msg.role === 'user' ? 'Que:' : msg.role === 'assistant' ? 'Ans:' : 'Note:'}
@@ -323,6 +342,70 @@ function Chat() {
                 </div>
               </div>
             ))}
+            */}
+
+
+
+
+
+            {messages.map((msg, index) => (
+              <div key={index} className="qa-item">
+                <div className={`qa-label ${msg.role === 'user' ? 'question-label' : 'answer-label'}`}>
+                  {msg.role === 'user' ? 'Que:' : msg.role === 'assistant' ? 'Ans:' : 'Note:'}
+                </div>
+                <div className="qa-content">
+                  {msg.role === 'user' ? (
+                    <div className="question-content">
+                      {msg.content}
+                    </div>
+                  ) : (
+                    <div className="answer-content">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          code({node, inline, className, children, ...props}) {
+                            const match = /language-(\w+)/.exec(className || '');
+                            return !inline && match ? (
+                              <SyntaxHighlighter
+                                language={match[1]}
+                                style={solarizedlight}
+                                PreTag="div"
+                                {...props}
+                              >
+                                {String(children).replace(/\n$/, '')}
+                              </SyntaxHighlighter>
+                            ) : (
+                              <code className={className} {...props}>
+                                {children}
+                              </code>
+                            );
+                          }
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             {loading && <div className="loading-indicator">Processing your query...</div>}
             <div ref={messagesEndRef} />
           </div>
@@ -369,6 +452,7 @@ function Chat() {
           </details>
         </div>
       )}
+      
     </div>
   );
 }
