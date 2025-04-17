@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
 
 function Chat() {
   const { chatId } = useParams();
@@ -303,7 +303,7 @@ function Chat() {
                           return !inline && match ? (
                             <SyntaxHighlighter
                               language={match[1]}
-                              style={solarizedlight}
+                              style={docco}
                               PreTag="div"
                               {...props}
                             >
