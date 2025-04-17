@@ -255,8 +255,90 @@ function Chat() {
           <p>API key not set. Please configure your API key to start your learning session.</p>
         </div>
       )}
+
+<div className="learning-workspace">
+    <div className="workspace-sidebar">
+      <button className="new-session-btn" onClick={createNewChat}>
+        Start New Topic
+      </button>
+      <div className="session-info">
+        <input
+          type="text"
+          className="session-title-input"
+          value={chatTitle}
+          onChange={handleTitleChange}
+          placeholder="Topic Title"
+        />
+        <div className="session-meta">
+          {messages.length > 0
+            ? `${messages.length} concept exchanges`
+            : 'No exchanges yet'}
+        </div>
+      </div>
+    </div>
+    <div className="learning-content">
+      <div className="messages-container">
+        {messages.length === 0 && (
+          <div className="empty-session">
+            <h3>Start a new learning exploration</h3>
+            <p>Ask questions, explore concepts, or request explanations on any topic.</p>
+          </div>
+        )}
+        {messages.map((msg, index) => (
+          <div key={index} className="qa-item">
+            <div
+              className={`qa-label ${
+                msg.role === 'user' ? 'question-label' : 'answer-label'
+              }`}
+            >
+              {msg.role === 'user' ? 'Que:' : msg.role === 'assistant' ? 'Ans:' : 'Note:'}
+            </div>
+            <div className="qa-content">
+              {msg.role === 'user' ? (
+                <div className="question-content">{msg.content}</div>
+              ) : (
+                <div className="answer-content">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      code({node, inline, className, children, ...props}) {
+                        const match = /language-(\w+)/.exec(className || '');
+                        return !inline && match ? (
+                          <SyntaxHighlighter
+                            language={match[1]}
+                            style={solarizedlight}
+                            PreTag="div"
+                            {...props}
+                          >
+                            {String(children).replace(/\n$/, '')}
+                          </SyntaxHighlighter>
+                        ) : (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      },
+                      h1: ({node, ...props}) => <h1 style={{margin: '24px 0 16px'}} {...props} />,
+                      h2: ({node, ...props}) => <h2 style={{margin: '20px 0 14px'}} {...props} />,
+                      h3: ({node, ...props}) => <h3 style={{margin: '16px 0 12px'}} {...props} />,
+                      h4: ({node, ...props}) => <h4 style={{margin: '14px 0 10px'}} {...props} />,
+                      ul: ({node, ...props}) => <ul style={{margin: '8px 0', paddingLeft: '24px'}} {...props} />,
+                      ol: ({node, ...props}) => <ol style={{margin: '8px 0', paddingLeft: '24px'}} {...props} />,
+                      li: ({node, ...props}) => <li style={{margin: '4px 0'}} {...props} />
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
       
-      <div className="learning-workspace">
+      {/* <div className="learning-workspace">
         <div className="workspace-sidebar">
           <button className="new-session-btn" onClick={createNewChat}>
             Start New Topic
@@ -287,62 +369,6 @@ function Chat() {
             )}
             
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            {/* {messages.map((msg, index) => (
-              <div key={index} className="qa-item">
-                <div className={`qa-label ${msg.role === 'user' ? 'question-label' : 'answer-label'}`}>
-                  {msg.role === 'user' ? 'Que:' : msg.role === 'assistant' ? 'Ans:' : 'Note:'}
-                </div>
-                <div className="qa-content">
-                  {msg.role === 'user' ? (
-                    <div>{msg.content}</div>
-                  ) : (
-                    <ReactMarkdown 
-                      remarkPlugins={[remarkGfm]}
-                      components={{
-                        code({node, inline, className, children, ...props}) {
-                          const match = /language-(\w+)/.exec(className || '');
-                          return !inline && match ? (
-                            <SyntaxHighlighter
-                              language={match[1]}
-                              style={solarizedlight}
-                              PreTag="div"
-                              {...props}
-                            >
-                              {String(children).replace(/\n$/, '')}
-                            </SyntaxHighlighter>
-                          ) : (
-                            <code className={className} {...props}>
-                              {children}
-                            </code>
-                          );
-                        }
-                      }}
-                    >
-                      {msg.content}
-                    </ReactMarkdown>
-                  )}
-                </div>
-              </div>
-            ))}
-            */}
 
 
 
@@ -394,18 +420,6 @@ function Chat() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
             {loading && <div className="loading-indicator">Processing your query...</div>}
             <div ref={messagesEndRef} />
           </div>
@@ -438,7 +452,7 @@ function Chat() {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {debugInfo && (
         <div className="debug-panel">
@@ -458,3 +472,4 @@ function Chat() {
 }
 
 export default Chat;
+
