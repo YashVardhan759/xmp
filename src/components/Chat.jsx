@@ -54,18 +54,17 @@ function Chat() {
 
 
   
-  useEffect(() =>
-      {
-        const handleKeyDown = (event) => {
-          if (event.ctrlKey && event.key === '?') 
-          {
-            event.preventDefault(); // Prevent browser's default behavior
-            toggleInputVisibility();
-          }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => { window.removeEventListener('keydown', handleKeyDown); };
-      }, []);
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === '/') {
+        event.preventDefault(); // Prevent browser's default behavior
+        toggleInputVisibility();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => { window.removeEventListener('keydown', handleKeyDown); };
+  }, [inputVisible]); // Add inputVisible as dependency
 
 
 
@@ -370,7 +369,7 @@ function Chat() {
             </button>
             
             {inputVisible && (
-              <div className="input-area">
+              <div className={`input-area ${inputVisible ? 'visible' : 'hidden'}`}>
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
