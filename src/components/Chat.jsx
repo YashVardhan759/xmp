@@ -452,6 +452,8 @@ function Chat() {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null); // Ref for the input element
 
+  setInputVisible(false);
+
   useEffect(() => {
     // Load settings from localStorage
     const savedApiKey = localStorage.getItem('geminiApiKey');
@@ -479,12 +481,11 @@ function Chat() {
 
     // Keyboard shortcut
     const handleKeyDown = (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'i') { // Ctrl+I or Cmd+I
-        event.preventDefault(); // Prevent default browser behavior
-        setInputVisible(true); // Show the input
-        if (inputRef.current) {
-          inputRef.current.focus(); // Focus the input
-        }
+      if ((event.ctrlKey || event.metaKey) && event.key === '?') 
+      { 
+        event.preventDefault();
+        setInputVisible(!inputVisible); // Show the input
+        inputRef.current.focus();
       }
     };
 
@@ -796,6 +797,7 @@ function Chat() {
           </details>
         </div>
       )}
+
     </div>
   );
 }

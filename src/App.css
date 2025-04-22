@@ -485,8 +485,8 @@ body {
   border: 1px solid var(--light-gray);
   border-radius: 8px;
   overflow: hidden;
-  /* display: flex; */
-  /* visibility: visible; */
+  display: none;
+  visibility: hidden;
 }
 
 .debug-panel summary {
@@ -599,4 +599,18 @@ body {
 
 a {
   text-decoration: none
+}
+
+.answer-content pre[class*="language-"], .answer-content code[class*="language-"] {
+  /* background-color: #f0f0f0 !important; */
+  /* font-size: larger; */
+}
+
+.answer-content code:not([class="language-"]) {
+  /* border: 2px solid red; */
+
+}
+
+.answer-content pre > div{  /* More specific selector */
+  background: #000000e5 !important;
 }
