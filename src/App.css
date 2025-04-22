@@ -256,7 +256,7 @@ body {
   flex: 1;
   padding: 0;
   overflow: hidden;
-  border-radius: 10px;
+  /* border-radius: 10px; */
   background-color: var(--white);
   box-shadow: 0 2px 10px #0000001a
 }
@@ -459,7 +459,7 @@ body {
 }
 
 .input-area.visible {
-  max-height: 200px; /* Same as base value */
+  max-height: 75vh; 
   opacity: 1;
 }
 
@@ -471,7 +471,8 @@ body {
   border-radius: 4px;
   resize: vertical;
   font-family: inherit;
-  font-size: 1rem
+  font-size: 1rem;
+  max-height: 100%;
 }
 
 .input-area button {

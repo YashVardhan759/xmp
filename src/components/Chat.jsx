@@ -25,6 +25,7 @@ function Chat() {
   const [chatTitle, setChatTitle] = useState("New Learning Module");
   const [inputVisible, setInputVisible] = useState(true);
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     // Load settings from localStorage
@@ -52,8 +53,16 @@ function Chat() {
     }
   }, [chatId]);
 
-
+  useEffect(() => {
+    if (inputVisible && textareaRef.current) {
+      // Small timeout to ensure the transition has started
+      setTimeout(() => {
+        textareaRef.current.focus();
+      }, 100);
+    }
+  }, [inputVisible]);
   
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.ctrlKey && event.key === '/') {
@@ -371,6 +380,7 @@ function Chat() {
             {inputVisible && (
               <div className={`input-area ${inputVisible ? 'visible' : 'hidden'}`}>
                 <textarea
+                  ref={textareaRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="What would you like to learn about today?"
