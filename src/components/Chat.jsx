@@ -452,7 +452,7 @@ function Chat() {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null); // Ref for the input element
 
-  setInputVisible(false);
+  // setInputVisible(false);
 
   useEffect(() => {
     // Load settings from localStorage
@@ -485,7 +485,7 @@ function Chat() {
       { 
         event.preventDefault();
         setInputVisible(!inputVisible); // Show the input
-        inputRef.current.focus();
+        // inputRef.current.focus();
       }
     };
 
